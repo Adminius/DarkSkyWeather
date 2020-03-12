@@ -73,7 +73,8 @@ DSW_current *current; // Pointers to structs that temporarily holds weather data
 DSW_hourly  *hourly;  // Not used
 DSW_daily   *daily;
 
-boolean booted = true;
+bool booted = true;
+byte counter = 0;
 
 GfxUi ui = GfxUi(&tft); // Jpeg and bmpDraw functions TODO: pull outside of a class
 
@@ -130,8 +131,8 @@ void setup() {
   tft.setTextDatum(BC_DATUM); // Bottom Centre datum
   tft.setTextColor(TFT_LIGHTGREY, TFT_BLACK);
 
-  tft.drawString("Original by: blog.squix.org", 120, 260);
-  tft.drawString("Adapted by: Bodmer", 120, 280);
+//  tft.drawString("Original by: blog.squix.org", 120, 260);
+//  tft.drawString("Adapted by: Bodmer", 120, 280);
 
   tft.setTextColor(TFT_YELLOW, TFT_BLACK);
 
@@ -184,8 +185,13 @@ void loop() {
     drawTime();
     lastMinute = minute();
 
-    // Request and synchronise the local clock
-    syncTime();
+    // Request and synchronise the local clock every 5 minutes
+    counter++;
+    if (counter >= 5)
+    {
+        syncTime();
+        counter = 0;
+    }
 
     #ifdef SCREEN_SERVER
       screenServer();
@@ -324,11 +330,11 @@ void drawTime() {
 **                          Draw the current weather
 ***************************************************************************************/
 void drawCurrentWeather() {
-  String date = "Updated: " + strDate(current->time);
+  String date = "Aktualisiert: " + strDate(current->time);
 
   tft.setTextDatum(BC_DATUM);
   tft.setTextColor(TFT_ORANGE, TFT_BLACK);
-  tft.setTextPadding(tft.textWidth(" Updated: Mmm 44 44:44 "));  // String width + margin
+  tft.setTextPadding(tft.textWidth(" Aktualisiert: 44 Mmm 44:44 "));  // String width + margin
   tft.drawString(date, 120, 16);
 
   String weatherIcon = "";
@@ -379,16 +385,10 @@ void drawCurrentWeather() {
   tft.setTextPadding(tft.textWidth("888 m/s")); // Max string length?
   tft.drawString(weatherText, 124, 136);
 
-  if (units == "us")
-  {
-    weatherText = current->pressure;
-    weatherText += " in";
-  }
-  else
-  {
-    weatherText = (uint16_t)current->pressure;
-    weatherText += " hPa";
-  }
+//  weatherText = "Regen ";
+  weatherText = (uint16_t)daily->precipProbability[0];
+  weatherText += " %";
+
 
   tft.setTextDatum(TR_DATUM);
   tft.setTextPadding(tft.textWidth(" 8888hPa")); // Max string length?
@@ -528,8 +528,7 @@ void drawAstronomy() {
 const char* getMeteoconIcon(uint8_t iconIndex)
 {
   if (iconIndex > MAX_ICON_INDEX) iconIndex = 0; // 0 = unknown
-  if( iconIndex == 4 && current->time > daily->sunsetTime[0] && current->time < daily->sunriseTime[1]) iconIndex = 5;
-  else if (iconIndex == 7) iconIndex = 4; // Change partly-cloudy-night to clear-day
+  if (iconIndex == 7) iconIndex = 4; // Change partly-cloudy-night to clear-day
   return dsw.iconName(iconIndex);
 }
 
@@ -627,6 +626,7 @@ void printWeather(void)
   Serial.print("icon               : "); Serial.println(current->icon);
   Serial.print("temperature        : "); Serial.println(current->temperature);
   Serial.print("humidity           : "); Serial.println(current->humidity);
+  Serial.print("precip probability : "); Serial.println(current->precipProbability);
   Serial.print("pressure           : "); Serial.println(current->pressure);
   Serial.print("wind speed         : "); Serial.println(current->windSpeed);
   Serial.print("wind dirn          : "); Serial.println(current->windBearing);
@@ -648,6 +648,7 @@ void printWeather(void)
     Serial.print("Moon phase         : "); Serial.println(daily->moonPhase[i]);
     Serial.print("temperatureHigh    : "); Serial.println(daily->temperatureHigh[i]);
     Serial.print("temperatureLow     : "); Serial.println(daily->temperatureLow[i]);
+    Serial.print("precip probability : "); Serial.println(daily->precipProbability[i]);
     Serial.println();
   }
 #endif
@@ -679,9 +680,9 @@ String strDate(time_t unixTime)
 
   String localDate = "";
 
-  localDate += monthShortStr(month(local_time));
-  localDate += " ";
   localDate += day(local_time);
+  localDate += " ";
+  localDate += monthShortStr(month(local_time));
   localDate += " " + strTime(unixTime);
 
   return localDate;

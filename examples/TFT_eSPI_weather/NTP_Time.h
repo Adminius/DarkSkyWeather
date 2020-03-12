@@ -128,7 +128,7 @@ void syncTime(void);
 void displayTime(void);
 void printTime(time_t zone, char *tzCode);
 void decodeNTP(void);
-void sendNTPpacket(IPAddress& address);
+unsigned long sendNTPpacket(IPAddress& address);
 
 //====================================================================================
 //                                    Update Time
@@ -148,7 +148,7 @@ void syncTime(void)
 //====================================================================================
 // Send an NTP request to the time server at the given address
 //====================================================================================
-void sendNTPpacket(IPAddress& address)
+unsigned long sendNTPpacket(IPAddress& address)
 {
   // Serial.println("sending NTP packet...");
   // set all bytes in the buffer to 0

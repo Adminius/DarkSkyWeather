@@ -24,7 +24,7 @@
 #define WIFI_SSID "Your_SSID"
 #define PASSWORD "Your_password"
 
-#define TIMEZONE UK // See NTP_Time.h tab for other "Zone references", UK, usMT etc
+#define TIMEZONE euCET // See NTP_Time.h tab for other "Zone references", UK, usMT etc
 
 // Update every 15 minutes, up to 1000 request per day are free (viz average of ~40 per hour)
 const int UPDATE_INTERVAL_SECS = 15 * 60UL; // 15 minutes
@@ -38,16 +38,16 @@ const String units = "si";
 const String api_key = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 
 // For language codes see https://darksky.net/dev/docs
-const String language = "en"; // Default language = en = English
+const String language = "de"; // Default language = en = English
 
 // Short day of week abbreviations used in 4 day forecast (change to your language)
-const String shortDOW [8] = {"???", "SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"};
+const String shortDOW [8] = {"???", "So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"};
 
 // Change the labels to your language here:
-const char sunStr[]        = "Sun";
-const char cloudStr[]      = "Cloud";
-const char humidityStr[]   = "Humidity";
-const String moonPhase [8] = {"New", "Waxing", "1st qtr", "Waxing", "Full", "Waning", "Last qtr", "Waning"};
+const char sunStr[]        = "Sonne";
+const char cloudStr[]      = "Wolken";
+const char humidityStr[]   = "Luftfeuchte";
+const String moonPhase [8] = {"", "", "", "", "", "", "", ""};
 
 // Set the forecast longitude and latitude to at least 4 decimal places
 const String latitude =  "27.9881"; // 90.0000 to -90.0000 negative for Southern hemisphere
